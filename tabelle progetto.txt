@@ -1,0 +1,183 @@
+CREATE TABLE Reato(
+	MatricolaDet 	char(8) 	PRIMARY KEY,
+	Nome		varchar(20) 	NOT NULL,
+	Data 		date 		NOT NULL,
+	Luogo 		varchar(15) 	NOT NULL,
+	Descrizione 	varchar(50) 	NOT NULL,
+
+	foreign key (MatricolaDet) references Detenuto(Matricola) 
+)
+CREATE TABLE Detenuto(
+	Matricola 	char(8) 	PRIMARY KEY,
+	Nome 		varchar(20) 	NOT NULL,
+	Cognome 	varchar(20)	NOT NULL,
+	LuogoN 		varchar(15) 	NOT NULL,
+	CF 		char(16) 	NOT NULL,
+	DataN 		date 		NOT NULL,
+	Nazionalita 	varchar(15) 	NOT NULL,
+	AnniRec 	smallint 	NOT NULL,
+	NumCella 	int 		NOT NULL,
+	Sede 		varchar(30) 	NOT NULL,
+
+	foreign key (NumCella) references Cella(Numero),
+	foreign key (Sede) references Sede(Nome)
+)
+CREATE TABLE Cella(
+	Numero 		int,
+	NomeSede 	varchar(30),
+	Capienza 	smallint 	NOT NULL,
+	PRIMARY KEY(Numero, NomeSede),
+	foreign key (NomeSede) references Sede(Nome) 
+)
+CREATE TABLE Sede(
+	Nome 		varchar(30) 	PRIMARY KEY,
+	Indirizzo 	varchar(30) 	NOT NULL,
+	LivelloS 	smallint 	NOT NULL,
+	Capienza 	smallint 	NOT NULL,
+	Tel 		int 		NOT NULL,
+	Citta 		varchar(15) 	NOT NULL,
+	Email 		varchar(30) 	NOT NULL,
+	Direttore 	char(16) 	NOT NULL,
+	foreign key (Direttore) references Dipendente(CF) 
+)
+CREATE TABLE VisitaEsterna(
+	Data 		date,
+	Detenuto 	char(8),
+	OrarioI 	time 		NOT NULL,
+	OrarioF 	time 		NOT NULL,
+	Ambiente 	char(5) 	NOT NULL,
+	PRIMARY KEY(Data, Detenuto),
+	foreign key (Detenuto) references Detenuto(Matricola),
+	foreign key (Ambiente) references AmbienteComune(Codice) 
+)
+CREATE TABLE Visitatore(
+	CF 		char(16) 	PRIMARY KEY,
+	Cognome 	varchar(15) 	NOT NULL,
+	Nome 		varchar(15) 	NOT NULL 
+)
+CREATE TABLE Corso(
+	Cod 		char(5) 	PRIMARY KEY,
+	Nome 		varchar(15) 	NOT NULL,
+	Desc 		varchar(30) 	NOT NULL,
+	OraI 		time 		NOT NULL,
+	OraF 		time 		NOT NULL,
+	Organizzatore 	char(16) 	NOT NULL,
+	Ambiente 	char(5) 	NOT NULL,
+	foreign key (Organizzatore) references Dipendente(CF),
+	foreign key (Ambiente) references AmbienteComune(Codice) 
+)
+CREATE TABLE VisitaSanitaria(
+	Data 		date,
+	MatricolaDet 	char(8),
+	Ora 		time 		NOT NULL,	
+	Tipo 		varchar(10) 	NOT NULL,
+	Ambiente 	char(5) 	NOT NULL,
+	Medico 		char(16) 	NOT NULL,
+	PRIMARY KEY(Data, MatricolaDet),	
+	foreign key (MatricolaDet) references Detenuto(Matricola),
+	foreign key (Ambiente) references AmbienteComune(Codice),
+	foreign key (Medico) references Dipendete(CF)
+)
+CREATE TABLE Polizia(
+	CFDip 		char(16) 	PRIMARY KEY,
+	foreign key (CFDip) references Dipendente(CF) 
+)
+CREATE TABLE Guardia(
+	Data 		date,
+	CFPolizia 	char(16), 
+	Cella 		int,
+	NomeSede 	varchar(30),
+	PRIMARY KEY(Data, CFPolizia, Cella, NomeSede),
+	foreign key (CFPolizia) references Dipendente(CF),
+	foreign key (Cella) references Cella(Numero),
+	foreign key (NomeSede) references Sede(Nome) 
+)
+CREATE TABLE Dipendente(
+	CF 		char(16) 	PRIMARY KEY,
+	Nome 		varchar(20) 	NOT NULL,
+	Cognome 	varchar(20) 	NOT NULL,
+	LuogoN 		varchar(15) 	NOT NULL,
+	DataN 		date 		NOT NULL,	
+	Nazionalita 	varchar(15) 	NOT NULL,
+	Residenza 	varchar(30) 	NOT NULL,
+	Sede 		varchar(30),
+	foreign key (Sede) references Sede(Nome)
+)
+CREATE TABLE Turno(
+	Cod 		int 		PRIMARY KEY,
+	OraI 		time 		NOT NULL, 
+	OraF 		time 		NOT NULL,
+	Dipendente 	char(16) 	NOT NULL,
+	foreign key (Dipendente) references Dipendente(CF)
+)
+CREATE TABLE AmbienteComune(
+	Codice 		char(5),
+	NomeSede 	varchar(30),
+	Capienza 	smallint 	NOT NULL,
+	Descrizione 	varchar(30) 	NOT NULL,
+	Responsabile 	char(16) 	NOT NULL,
+	PRIMARY KEY(Codice, NomeSede),
+	foreign key (NomeSede) references Sede(Nome),
+	foreign key (Responsabile) references Dipendente(CF) 
+)
+CREATE TABLE Giorno(
+	Nome 		varchar(10) 	PRIMARY KEY 
+)
+CREATE TABLE ReclusionePassata(
+	Detenuto 	char(8),
+	NomeSede 	varchar(30),
+	PRIMARY KEY(Detenuto, NomeSede),
+	DataI 		date 		NOT NULL,
+	DataF 		date 		NOT NULL,
+	foreign key (Detenuto) references Detenuto(Matricola),
+	foreign key (NomeSede) references Sede(Nome) 
+)
+CREATE TABLE ReclusioneAttuale(
+	Detenuto 	char(8),
+	NomeSede 	varchar(30),
+	PRIMARY KEY(Detenuto, NomeSede),
+	DataI 		date 		NOT NULL,
+	foreign key (Detenuto) references Detenuto(Matricola),
+	foreign key (NomeSede) references Sede(Nome) 
+)
+CREATE TABLE Sorveglianza(
+	Detenuto 	char(8),
+	DataVisita 	date,
+	Guardia 	char(16),
+	PRIMARY KEY(Detenuto, DataVisita, Guardia),
+	foreign key (Detenuto) references Detenuto(Matricola),
+	foreign key (DataVisita) references VisitaEsterna(Data),
+	foreign key (Guardia) references Dipendente(CF) 
+)
+CREATE TABLE Partecipazione(
+	Detenuto 	char(8),
+	DataVisita 	date,
+	Visitatore 	char(16),
+	PRIMARY KEY(Detenuto, DataVisita, Visitatore),
+	foreign key (Detenuto) references Detenuto(Matricola),
+	foreign key (DataVisita) references VisitaEsterna(Data),
+	foreign key (Visitatore) references Visitatore(CF) 
+)
+CREATE TABLE Frequenza(
+	Detenuto 	char(8),
+	CodCorso 	char(5),
+	PRIMARY KEY(Detenuto, CodCorso),
+	foreign key (Detenuto) references Detenuto(Matricola),
+	foreign key (CodCorso) references Corso(Cod) 
+)
+CREATE TABLE Pianificato(
+	Giorno 		varchar(10),
+	Corso 		char(5),
+	PRIMARY KEY(Giorno, Corso),
+	foreign key (Giorno) references Giorno(Nome),
+	foreign key (Corso) references Corso(Cod) 
+)
+
+CREATE TABLE Programmato(
+	Giorno 		varchar(10),
+	Turno 		char(5),
+	PRIMARY KEY(Giorno, Turno),
+	foreign key (Giorno) references Giorno(Nome),
+	foreign key (Turno) references Turno(Cod) 
+)
+
