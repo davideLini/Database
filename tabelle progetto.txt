@@ -6,7 +6,7 @@ CREATE TABLE Reato(
 	Descrizione 	varchar(50) 	NOT NULL,
 
 	foreign key (MatricolaDet) references Detenuto(Matricola) 
-)
+);
 CREATE TABLE Detenuto(
 	Matricola 	char(8) 	PRIMARY KEY,
 	Nome 		varchar(20) 	NOT NULL,
@@ -21,14 +21,14 @@ CREATE TABLE Detenuto(
 
 	foreign key (NumCella) references Cella(Numero),
 	foreign key (Sede) references Sede(Nome)
-)
+);
 CREATE TABLE Cella(
 	Numero 		int,
 	NomeSede 	varchar(30),
 	Capienza 	smallint 	NOT NULL,
 	PRIMARY KEY(Numero, NomeSede),
 	foreign key (NomeSede) references Sede(Nome) 
-)
+);
 CREATE TABLE Sede(
 	Nome 		varchar(30) 	PRIMARY KEY,
 	Indirizzo 	varchar(30) 	NOT NULL,
@@ -39,7 +39,7 @@ CREATE TABLE Sede(
 	Email 		varchar(30) 	NOT NULL,
 	Direttore 	char(16) 	NOT NULL,
 	foreign key (Direttore) references Dipendente(CF) 
-)
+);
 CREATE TABLE VisitaEsterna(
 	Data 		date,
 	Detenuto 	char(8),
